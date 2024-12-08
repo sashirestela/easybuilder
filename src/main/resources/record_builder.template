@@ -1,0 +1,38 @@
+package ${packageName};
+
+public class ${builderName} {
+
+    // Fields
+    #{for(recComp in recordComponents)}private ${recComp.getType()} ${recComp.getName()};
+    #{endfor}
+
+    // Constructor
+    private ${builderName}() {
+    }
+
+    // Static method to create a new builder
+    public static ${builderName} builder() {
+        return new ${builderName}();
+    }
+
+    // Static method to create a new builder from a record
+    public static ${builderName} builder(${recordName} other) {
+        ${builderName} one = new ${builderName}();
+        #{for(recComp in recordComponents)}one.${recComp.getName()} = other.${recComp.getName()}();
+        #{endfor}
+        return one;
+    }
+
+    // Accesors
+    #{for(recComp in recordComponents)}
+    public ${builderName} ${recComp.getName()}(${recComp.getType()} ${recComp.getName()}) {
+        this.${recComp.getName()} = ${recComp.getName()};
+        return this;
+    }
+    #{endfor}
+
+    // Build method
+    public ${recordName} build() {
+        return new ${recordName}(#{for(recComp in recordComponents, ', ')}${recComp.getName()}#{endfor});
+    }
+}

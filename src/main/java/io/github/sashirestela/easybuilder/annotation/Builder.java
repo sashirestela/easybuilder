@@ -1,4 +1,4 @@
-package io.github.sashirestela.easybuilder;
+package io.github.sashirestela.easybuilder.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

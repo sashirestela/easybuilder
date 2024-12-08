@@ -1,6 +1,10 @@
-package io.github.sashirestela.easybuilder;
+package io.github.sashirestela.easybuilder.processor;
 
 import com.google.auto.service.AutoService;
+
+import io.github.sashirestela.easybuilder.annotation.Builder;
+import io.github.sashirestela.easybuilder.model.RecordComponent;
+import io.github.sashirestela.easybuilder.support.TemplateProcessor;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -18,6 +22,11 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
 import java.io.Writer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -68,54 +77,20 @@ public class BuilderProcessor extends AbstractProcessor {
         String packageName = processingEnv.getElementUtils().getPackageOf(recordElement).getQualifiedName().toString();
         String recordName = recordElement.getSimpleName().toString();
         String builderName = recordName + "Builder";
-
-        // Generate fields and methods for the builder
-        String fields = recordElement.getRecordComponents()
-                .stream()
-                .map(component -> "private " + component.asType() + " " + component.getSimpleName() + ";")
-                .collect(Collectors.joining("\n"));
-
-        String ofMethod = "public static " + builderName + " of(" + recordName + " other) {\n" +
-                "    " + builderName + " one = new " + builderName + "();\n" +
-                recordElement.getRecordComponents()
-                        .stream()
-                        .map(component -> "    one." + component.getSimpleName() + " = other."
-                                + component.getSimpleName() + "();")
-                        .collect(Collectors.joining("\n"))
-                + "\n" +
-                "    return one;\n" +
-                "}";
-
-        String methods = recordElement.getRecordComponents()
-                .stream()
-                .map(component -> "public " + builderName + " " + component.getSimpleName() + "(" + component.asType()
-                        + " " + component.getSimpleName() + ") {\n"
-                        + "    this." + component.getSimpleName() + " = " + component.getSimpleName() + ";\n"
-                        + "    return this;\n"
-                        + "}")
-                .collect(Collectors.joining("\n\n"));
-
-        String buildMethod = "public " + recordName + " build() {\n" +
-                "    return new " + recordName + "(" +
-                recordElement.getRecordComponents()
-                        .stream()
-                        .map(component -> component.getSimpleName().toString())
-                        .collect(Collectors.joining(", "))
-                +
-                ");\n}";
-
-        String classContent = "package " + packageName + ";\n\n" +
-                "public class " + builderName + " {\n" +
-                fields + "\n\n" +
-                ofMethod + "\n\n" +
-                methods + "\n\n" +
-                buildMethod + "\n\n" +
-                "}";
+        List<RecordComponent> recordComponents = recordElement.getRecordComponents().stream()
+                .map(rc -> new RecordComponent(rc.getSimpleName().toString(), rc.asType().toString()))
+                .collect(Collectors.toList());
+        Map<String, Object> context = new HashMap<>();
+        context.put("packageName", packageName);
+        context.put("recordName", recordName);
+        context.put("builderName", builderName);
+        context.put("recordComponents", recordComponents);
+        String content = TemplateProcessor.process(Paths.get("src/main/resources/record_builder.template"), context);
 
         // Write the file
         JavaFileObject file = processingEnv.getFiler().createSourceFile(packageName + "." + builderName);
         try (Writer writer = file.openWriter()) {
-            writer.write(classContent);
+            writer.write(content);
         }
     }
 
