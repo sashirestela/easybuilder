@@ -31,8 +31,19 @@ public class ${builderName} {
     }
     #{endfor}
 
+    // Withers
+    #{for(recComp in recordComponents)}
+    public ${recordName} with${recComp.getNamePascalCase()}(${recComp.getType()} ${recComp.getName()}) {
+        return new ${recordName}(
+            #{for(recComp in recordComponents, ',')}this.${recComp.getName()}
+            #{endfor});
+    }
+    #{endfor}
+
     // Build method
     public ${recordName} build() {
-        return new ${recordName}(#{for(recComp in recordComponents, ', ')}${recComp.getName()}#{endfor});
+        return new ${recordName}(
+            #{for(recComp in recordComponents, ',')}this.${recComp.getName()}
+            #{endfor});
     }
 }

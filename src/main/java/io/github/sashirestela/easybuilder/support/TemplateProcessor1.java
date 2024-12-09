@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,28 +11,22 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TemplateProcessor {
+public class TemplateProcessor1 {
 
     /**
-     * Processes a template string with advanced variable replacements and nested directives
+     * Processes a template string with variable replacements, supporting multiple elseif and nested
+     * directives
      * 
      * @param template The input template string
      * @param context  A map of variables and their values
-     * @return Processed string with variables replaced and directives resolved
+     * @return Processed string with variables replaced
      */
     public static String process(String template, Map<String, Object> context) {
-        String processedTemplate = template;
-        String previousTemplate;
+        // First, handle variable replacements
+        String processedTemplate = replaceVariables(template, context);
 
-        do {
-            previousTemplate = processedTemplate;
-            
-            // Replace variables first
-            processedTemplate = replaceVariables(processedTemplate, context);
-            
-            // Resolve nested directives recursively
-            processedTemplate = processNestedDirectives(processedTemplate, context);
-        } while (!processedTemplate.equals(previousTemplate));
+        // Then handle nested control structures
+        processedTemplate = processNestedDirectives(processedTemplate, context);
 
         return processedTemplate;
     }
@@ -44,20 +37,7 @@ public class TemplateProcessor {
     }
 
     /**
-     * Enhanced nested directive processing with recursive resolution
-     */
-    private static String processNestedDirectives(String template, Map<String, Object> context) {
-        // Process inner loops first (more specific patterns)
-        String processedTemplate = processLoops(template, context);
-        
-        // Then process conditionals
-        processedTemplate = processConditionals(processedTemplate, context);
-
-        return processedTemplate;
-    }
-
-    /**
-     * Replaces ${variable} placeholders with more robust handling
+     * Replaces ${variable} placeholders with their corresponding values
      */
     private static String replaceVariables(String template, Map<String, Object> context) {
         Pattern varPattern = Pattern.compile("\\$\\{(.*?)\\}");
@@ -77,14 +57,27 @@ public class TemplateProcessor {
     }
 
     /**
-     * Enhanced conditional processing with more flexible nested handling
+     * Processes nested directives by recursively handling conditionals and loops
+     */
+    private static String processNestedDirectives(String template, Map<String, Object> context) {
+        // First, process conditionals (which may contain nested elements)
+        String processedTemplate = processConditionals(template, context);
+
+        // Then process loops (which may also contain nested elements)
+        processedTemplate = processLoops(processedTemplate, context);
+
+        return processedTemplate;
+    }
+
+    /**
+     * Processes conditional blocks with support for multiple elseif
      */
     private static String processConditionals(String template, Map<String, Object> context) {
         Pattern conditionalPattern = Pattern.compile(
-                "\\#\\{if\\((.*?)\\)}(.*?)" + 
-                "((?:\\#\\{elseif\\((.*?)\\)}(.*?))*)" + 
-                "(?:\\#\\{else\\}(.*?))?" + 
-                "\\#\\{endif\\}",
+                "\\#\\{if\\((.*?)\\)}(.*?)" + // Initial if block
+                        "((?:\\#\\{elseif\\((.*?)\\)}(.*?))*)" + // Multiple elseif blocks
+                        "(?:\\#\\{else\\}(.*?))?" + // Optional else block
+                        "\\#\\{endif\\}",
                 Pattern.DOTALL);
 
         Matcher matcher = conditionalPattern.matcher(template);
@@ -109,7 +102,34 @@ public class TemplateProcessor {
     }
 
     /**
-     * Enhanced loop processing with more robust nested directive handling
+     * Evaluates multi-conditional logic with multiple elseif blocks
+     */
+    private static String evaluateMultiConditional(String mainCondition, String mainBlock, String elseIfBlocks,
+            String elseBlock, Map<String, Object> context) {
+        // Check main if condition
+        if (evaluateCondition(mainCondition, context)) {
+            return process(mainBlock, context);
+        }
+
+        // Check multiple elseif conditions
+        Pattern elseIfPattern = Pattern.compile("\\#\\{elseif\\((.*?)\\)\\}(.*?)(?=\\#\\{|$)");
+        Matcher elseIfMatcher = elseIfPattern.matcher(elseIfBlocks);
+
+        while (elseIfMatcher.find()) {
+            String elseIfCondition = elseIfMatcher.group(1);
+            String elseIfBlock = elseIfMatcher.group(2);
+
+            if (evaluateCondition(elseIfCondition, context)) {
+                return process(elseIfBlock, context);
+            }
+        }
+
+        // Return else block if no conditions met
+        return process(elseBlock, context);
+    }
+
+    /**
+     * Processes loop blocks with support for nested directives and optional separator
      */
     private static String processLoops(String template, Map<String, Object> context) {
         Pattern loopPattern = Pattern.compile(
@@ -137,41 +157,7 @@ public class TemplateProcessor {
     }
 
     /**
-     * Evaluates multi-conditional logic with enhanced flexibility
-     */
-    private static String evaluateMultiConditional(String mainCondition, String mainBlock, 
-            String elseIfBlocks, String elseBlock, Map<String, Object> context) {
-        // Recursively process nested directives in blocks
-        mainBlock = process(mainBlock, context);
-        elseBlock = process(elseBlock, context);
-
-        // Check main if condition
-        if (evaluateCondition(mainCondition, context)) {
-            return mainBlock;
-        }
-
-        // Check multiple elseif conditions
-        Pattern elseIfPattern = Pattern.compile("\\#\\{elseif\\((.*?)\\)\\}(.*?)(?=\\#\\{|$)");
-        Matcher elseIfMatcher = elseIfPattern.matcher(elseIfBlocks);
-
-        while (elseIfMatcher.find()) {
-            String elseIfCondition = elseIfMatcher.group(1);
-            String elseIfBlock = elseIfMatcher.group(2);
-
-            // Recursively process nested directives in elseif block
-            elseIfBlock = process(elseIfBlock, context);
-
-            if (evaluateCondition(elseIfCondition, context)) {
-                return elseIfBlock;
-            }
-        }
-
-        // Return else block if no conditions met
-        return elseBlock;
-    }
-
-    /**
-     * Enhanced loop evaluation with more comprehensive processing
+     * Evaluates and processes loop iterations with nested processing and optional separator
      */
     private static String evaluateLoop(String loopVar, String collectionVar, String separator,
             String loopBody, String elseBody, Map<String, Object> context) {
@@ -196,7 +182,6 @@ public class TemplateProcessor {
                 loopContext.put(loopVar + "_index", i);
                 loopContext.put(loopVar + "_size", list.size());
 
-                // Recursively process nested directives in loop body
                 String processedBody = process(loopBody, loopContext);
                 output.append(processedBody);
 
@@ -219,7 +204,6 @@ public class TemplateProcessor {
                 loopContext.put(loopVar + "_index", i);
                 loopContext.put(loopVar + "_size", array.length);
 
-                // Recursively process nested directives in loop body
                 String processedBody = process(loopBody, loopContext);
                 output.append(processedBody);
 
@@ -236,111 +220,78 @@ public class TemplateProcessor {
     }
 
     /**
-     * Condition evaluation with more flexible boolean conversion
+     * Evaluates a single condition
      */
     private static boolean evaluateCondition(String condition, Map<String, Object> context) {
         if (condition == null || condition.trim().isEmpty())
             return false;
 
+        // Evaluate using expression parsing
         String value = evaluateExpression(condition.trim(), context);
 
-        // More robust boolean conversion
-        return Boolean.parseBoolean(value) || 
-               (!value.isEmpty() && 
-                !"false".equalsIgnoreCase(value) && 
-                !"0".equals(value));
+        // Convert result to boolean
+        return Boolean.parseBoolean(value) || (!value.isEmpty() && !"false".equalsIgnoreCase(value));
     }
 
-    /**
-     * Enhanced expression evaluation with improved method call support
-     */
     private static String evaluateExpression(String expression, Map<String, Object> context) {
         try {
-            // Handle method calls with dot notation
-            if (expression.contains(".")) {
+            // Handle method calls
+            if (expression.contains("(")) {
                 return evaluateMethodCall(expression, context);
             }
-            
             // Handle direct variable replacement
             if (context.containsKey(expression)) {
                 return Objects.toString(context.get(expression), "");
             }
-            
-            return expression; // Return original expression if no match
+            return ""; // Default to empty if not found
         } catch (Exception e) {
             return ""; // Fallback for errors
         }
     }
 
-    /**
-     * More robust method call evaluation
-     */
     private static String evaluateMethodCall(String expression, Map<String, Object> context) throws Exception {
-        Pattern methodPattern = Pattern.compile("(.*?)\\.([^(]+)\\((.*?)\\)");
+        Pattern methodPattern = Pattern.compile("(\\w+)\\.(\\w+)\\((.*?)\\)");
         Matcher matcher = methodPattern.matcher(expression);
 
         if (!matcher.matches())
-            return expression;
+            return "";
 
-        String objectExpression = matcher.group(1);
+        String objectName = matcher.group(1);
         String methodName = matcher.group(2);
-        String[] paramExpressions = matcher.group(3).isEmpty() ? 
-            new String[0] : matcher.group(3).split("\\s*,\\s*");
+        String[] params = (matcher.group(3).isEmpty() ? new String[0] : matcher.group(3).split(",", 0));
 
-        // Resolve the object, potentially nested
-        Object object = resolveNestedObject(objectExpression, context);
+        // Resolve object from context
+        Object object = context.get(objectName);
         if (object == null)
             return "";
 
-        // Resolve method and prepare parameters
-        List<Object> resolvedParams = new ArrayList<>();
-        for (String paramExp : paramExpressions) {
-            resolvedParams.add(evaluateExpression(paramExp, context));
-        }
-
-        // Find and invoke method
-        Method method = findBestMatchingMethod(object.getClass(), methodName, resolvedParams);
+        // Resolve method and invoke it
+        Class<?> clazz = object.getClass();
+        Method method = findMethod(clazz, methodName, params.length);
         if (method == null)
             return "";
 
-        Object result = method.invoke(object, resolvedParams.toArray());
+        Object[] parsedParams = parseParameters(params, context);
+        Object result = method.invoke(object, parsedParams);
         return Objects.toString(result, "");
     }
 
-    /**
-     * Resolves nested object references (e.g., "user.address.street")
-     */
-    private static Object resolveNestedObject(String expression, Map<String, Object> context) {
-        String[] parts = expression.split("\\.");
-        Object current = context.get(parts[0]);
-        
-        for (int i = 1; i < parts.length && current != null; i++) {
-            try {
-                Method getter = current.getClass().getMethod("get" + 
-                    Character.toUpperCase(parts[i].charAt(0)) + parts[i].substring(1));
-                current = getter.invoke(current);
-            } catch (Exception e) {
-                return null;
+    private static Method findMethod(Class<?> clazz, String methodName, int paramCount) {
+        for (Method method : clazz.getMethods()) {
+            if (method.getName().equals(methodName) && method.getParameterCount() == paramCount) {
+                return method;
             }
         }
-        
-        return current;
+        return null;
     }
 
-    /**
-     * Finds the best matching method based on parameter types
-     */
-    private static Method findBestMatchingMethod(Class<?> clazz, String methodName, List<Object> params) {
-        Method method = null;
-        try {
-            if (params.isEmpty()) {
-                method = clazz.getMethod(methodName);
-            } else {
-                method = clazz.getMethod(methodName, (Class<?>[]) params.stream().map(p -> p.getClass()).toArray());
-            }
-            return method;
-        } catch (Exception e) {
+    private static Object[] parseParameters(String[] params, Map<String, Object> context) {
+        Object[] parsedParams = new Object[params.length];
+        for (int i = 0; i < params.length; i++) {
+            String param = params[i].trim();
+            parsedParams[i] = context.containsKey(param) ? context.get(param) : param;
         }
-        return method;
+        return parsedParams;
     }
+
 }
