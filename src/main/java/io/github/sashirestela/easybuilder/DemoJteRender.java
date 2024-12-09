@@ -1,16 +1,16 @@
 package io.github.sashirestela.easybuilder;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import gg.jte.TemplateOutput;
+import gg.jte.output.StringOutput;
 import io.github.sashirestela.easybuilder.model.RecordComponent;
-import io.github.sashirestela.easybuilder.support.TemplateProcessor;
-import io.github.sashirestela.easybuilder.support.TemplateProcessor1;
+import io.github.sashirestela.easybuilder.support.Configurator;
 
-public class TemplateProcessorTest {
+public class DemoJteRender {
 
     public static void main(String[] args) throws IOException {
         Map<String, Object> context = new HashMap<>();
@@ -18,10 +18,11 @@ public class TemplateProcessorTest {
         context.put("recordName", "Address");
         context.put("builderName", "AddressBuilder");
         context.put("recordComponents", List.of(
-            new RecordComponent("street", "String"),
-            new RecordComponent("city", "String"),
-            new RecordComponent("zipCode", "String")));
-        String content = TemplateProcessor.process(Paths.get("src/main/resources/record_builder.template"), context);
-        System.out.println(content);
+                new RecordComponent("street", "String"),
+                new RecordComponent("city", "String"),
+                new RecordComponent("zipCode", "String")));
+        TemplateOutput output = new StringOutput();
+        Configurator.one().getTemplateEngine().render("record_builder.jte", context, output);
+        System.out.println(output.toString());
     }
 }

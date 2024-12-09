@@ -53,6 +53,7 @@
     <!-- Dependencies Versions -->
     <slf4j.version>2.0.16</slf4j.version>
     <autoservice.version>1.1.1</autoservice.version>
+    <jte.version>3.1.15</jte.version>
     <junit.version>5.11.3</junit.version>
     <!-- Plugins Versions -->
     <compiler.version>3.13.0</compiler.version>
@@ -165,6 +166,11 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
+        <groupId>gg.jte</groupId>
+        <artifactId>jte</artifactId>
+        <version>${jte.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter</artifactId>
         <version>${junit.version}</version>
@@ -185,6 +191,10 @@
     <dependency>
       <groupId>com.google.auto.service</groupId>
       <artifactId>auto-service</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>gg.jte</groupId>
+      <artifactId>jte</artifactId>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>

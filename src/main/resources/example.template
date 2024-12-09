@@ -1,5 +1,0 @@
-Hello, ${user.getName()}!
-Your age is ${user.getAge()}.
-Roles:
-    #{for(role in roles)}- ${role.getName()}
-    #{elsefor}No roles.#{endfor}

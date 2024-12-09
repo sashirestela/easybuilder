@@ -2,9 +2,11 @@ package io.github.sashirestela.easybuilder.processor;
 
 import com.google.auto.service.AutoService;
 
+import gg.jte.TemplateOutput;
+import gg.jte.output.StringOutput;
 import io.github.sashirestela.easybuilder.annotation.Builder;
 import io.github.sashirestela.easybuilder.model.RecordComponent;
-import io.github.sashirestela.easybuilder.support.TemplateProcessor1;
+import io.github.sashirestela.easybuilder.support.Configurator;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -85,12 +87,14 @@ public class BuilderProcessor extends AbstractProcessor {
         context.put("recordName", recordName);
         context.put("builderName", builderName);
         context.put("recordComponents", recordComponents);
-        String content = TemplateProcessor1.process(Paths.get("src/main/resources/record_builder.template"), context);
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Context: " + context.toString());
 
+        TemplateOutput output = new StringOutput();
+        Configurator.one().getTemplateEngine().render("record_builder.jte", context, output);
         // Write the file
         JavaFileObject file = processingEnv.getFiler().createSourceFile(packageName + "." + builderName);
         try (Writer writer = file.openWriter()) {
-            writer.write(content);
+            writer.write(output.toString());
         }
     }
 
