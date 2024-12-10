@@ -6,7 +6,7 @@
 
   <groupId>io.github.sashirestela</groupId>
   <artifactId>easybuilder</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <packaging>jar</packaging>
 
   <name>easybuilder</name>
@@ -222,6 +222,24 @@
         <configuration>
           <showWarnings>true</showWarnings>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>gg.jte</groupId>
+        <artifactId>jte-maven-plugin</artifactId>
+        <version>${jte.version}</version>
+        <configuration>
+          <sourceDirectory>${project.basedir}/src/main/resources/jte</sourceDirectory>
+          <contentType>Plain</contentType>
+        </configuration>
+        <executions>
+          <execution>
+            <?m2e execute onConfiguration?>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

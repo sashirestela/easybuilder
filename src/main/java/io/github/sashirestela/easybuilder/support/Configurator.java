@@ -1,11 +1,11 @@
 package io.github.sashirestela.easybuilder.support;
 
-import java.nio.file.Path;
-
 import gg.jte.CodeResolver;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.DirectoryCodeResolver;
+
+import java.nio.file.Path;
 
 public class Configurator {
 
@@ -25,13 +25,26 @@ public class Configurator {
 
     public TemplateEngine getTemplateEngine() {
         if (templateEngine == null) {
-            CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src/main/resources/jte"));
-            templateEngine = TemplateEngine.create(
-                codeResolver,
-                Path.of("jte-classes"),
-                ContentType.Plain,
-                this.getClass().getClassLoader());
+            if (isDevelopmentMode()) {
+                CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src/main/resources/jte"));
+                templateEngine = TemplateEngine.create(
+                        codeResolver,
+                        Path.of("jte-classes"),
+                        ContentType.Plain,
+                        this.getClass().getClassLoader());
+            } else {
+                templateEngine = TemplateEngine.createPrecompiled(
+                        Path.of("jte-classes"),
+                        ContentType.Plain,
+                        this.getClass().getClassLoader());
+            }
         }
         return templateEngine;
     }
+
+    private boolean isDevelopmentMode() {
+        return Boolean.parseBoolean(
+                System.getProperty("dev.mode", "false"));
+    }
+
 }
