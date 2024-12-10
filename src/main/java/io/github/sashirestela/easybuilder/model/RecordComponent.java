@@ -1,7 +1,5 @@
 package io.github.sashirestela.easybuilder.model;
 
-import io.github.sashirestela.easybuilder.support.Common;
-
 public class RecordComponent {
 
     private String name;
@@ -18,14 +16,6 @@ public class RecordComponent {
 
     public String getType() {
         return type;
-    }
-
-    public String getNamePascalCase() {
-        return Common.toPascalCase(name);
-    }
-
-    public String toString() {
-        return "[name:" + this.name + ", type:" + this.type + "]";
     }
 
 }

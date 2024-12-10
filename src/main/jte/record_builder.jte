@@ -6,7 +6,6 @@
 @param String recordName
 @param String builderName
 @param List<RecordComponent> recordComponents
-
 package ${packageName};
 
 public class ${builderName} {
