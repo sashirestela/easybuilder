@@ -1,0 +1,48 @@
+package io.github.sashirestela.easybuilder;
+
+public class ItemBuilder {
+
+    // Fields
+    private java.lang.Integer id;
+    private java.lang.String description;
+    
+
+    // Constructor
+    private ItemBuilder() {
+    }
+
+    // Static method to create a new builder
+    public static ItemBuilder builder() {
+        return new ItemBuilder();
+    }
+
+    // Static method to create a new builder from a record
+    public static ItemBuilder builder(Item other) {
+        ItemBuilder one = new ItemBuilder();
+        one.id = other.id();
+        one.description = other.description();
+        
+        return one;
+    }
+
+    // Accesors
+    
+    public ItemBuilder id(java.lang.Integer id) {
+        this.id = id;
+        return this;
+    }
+    
+    public ItemBuilder description(java.lang.String description) {
+        this.description = description;
+        return this;
+    }
+    
+
+    // Build method
+    public Item build() {
+        return new Item(
+            this.id,
+            this.description
+            );
+    }
+}

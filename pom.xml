@@ -55,6 +55,7 @@
     <autoservice.version>1.1.1</autoservice.version>
     <jte.version>3.1.15</jte.version>
     <junit.version>5.11.3</junit.version>
+    <cute.version>1.7.0</cute.version>
     <!-- Plugins Versions -->
     <compiler.version>3.13.0</compiler.version>
     <enforcer.version>3.5.0</enforcer.version>
@@ -176,6 +177,12 @@
         <version>${junit.version}</version>
         <scope>test</scope>
       </dependency>
+      <dependency>
+        <groupId>io.toolisticon.cute</groupId>
+        <artifactId>cute</artifactId>
+        <version>${cute.version}</version>
+        <scope>test</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -199,6 +206,10 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.toolisticon.cute</groupId>
+      <artifactId>cute</artifactId>
     </dependency>
   </dependencies>
 
