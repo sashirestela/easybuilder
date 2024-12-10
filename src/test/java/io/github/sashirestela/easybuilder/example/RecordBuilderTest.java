@@ -1,4 +1,4 @@
-package io.github.sashirestela.easybuilder;
+package io.github.sashirestela.easybuilder.example;
 
 import org.junit.jupiter.api.Test;
 
