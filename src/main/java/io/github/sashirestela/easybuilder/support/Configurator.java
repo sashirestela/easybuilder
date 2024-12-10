@@ -25,7 +25,7 @@ public class Configurator {
 
     public TemplateEngine getTemplateEngine() {
         if (templateEngine == null) {
-            CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src/main/jte"));
+            CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src/main/resources/jte"));
             templateEngine = TemplateEngine.create(
                 codeResolver,
                 Path.of("jte-classes"),
