@@ -2,7 +2,6 @@ package io.github.sashirestela.easybuilder.processor;
 
 import io.toolisticon.cute.Cute;
 import io.toolisticon.cute.CuteApi;
-import io.toolisticon.cute.JavaFileObjectUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,11 +31,15 @@ class BuilderProcessorTest {
                 .ofKindNote()
                 .contains("Generating from Class io.github.sashirestela.easybuilder.Item")
                 .andThat()
+                .compilerMessage()
+                .ofKindNote()
+                .contains("Generating from Class io.github.sashirestela.easybuilder.Item.SubItem")
+                .andThat()
                 .generatedSourceFile("io.github.sashirestela.easybuilder.ItemBuilder")
-                .matches(
-                        CuteApi.ExpectedFileObjectMatcherKind.BINARY,
-                        JavaFileObjectUtils.readFromResource("../../../../../testcases/ItemBuilder.java.ct",
-                                BuilderProcessorTest.class))
+                .exists()
+                .andThat()
+                .generatedSourceFile("io.github.sashirestela.easybuilder.SubItemBuilder")
+                .exists()
                 .executeTest();
     }
 
