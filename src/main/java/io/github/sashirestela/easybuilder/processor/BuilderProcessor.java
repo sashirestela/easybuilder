@@ -1,6 +1,5 @@
 package io.github.sashirestela.easybuilder.processor;
 
-import com.google.auto.service.AutoService;
 import gg.jte.TemplateOutput;
 import gg.jte.output.StringOutput;
 import io.github.sashirestela.easybuilder.annotation.Builder;
@@ -11,7 +10,6 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -30,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@AutoService(Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
 @SupportedAnnotationTypes({ "io.github.sashirestela.easybuilder.annotation.Builder" })
 public class BuilderProcessor extends AbstractProcessor {
