@@ -17,6 +17,7 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic.Kind;
@@ -64,15 +65,10 @@ public class BuilderProcessor extends AbstractProcessor {
     }
 
     private void generateSourceFile(TypeElement recordElement) throws Exception {
-        String packageName = elementUtils.getPackageOf(recordElement).getQualifiedName().toString();
-        String recordName = recordElement.getSimpleName().toString();
-        String builderName = recordName + "Builder";
-        List<RecordComponent> recordComponents = recordElement.getRecordComponents()
-                .stream()
-                .map(rc -> new RecordComponent(
-                        rc.getSimpleName().toString(),
-                        rc.asType().toString()))
-                .collect(Collectors.toList());
+        String packageName = getPackageName(recordElement);
+        String recordName = getRecordName(recordElement);
+        String builderName = getBuilderName(recordElement);
+        List<RecordComponent> recordComponents = getRecordComponents(recordElement);
 
         Map<String, Object> context = new HashMap<>();
         context.put("packageName", packageName);
@@ -87,6 +83,34 @@ public class BuilderProcessor extends AbstractProcessor {
         try (Writer writer = javaFile.openWriter()) {
             writer.write(templateOutput.toString());
         }
+    }
+
+    private String getPackageName(TypeElement recordElement) {
+        return elementUtils.getPackageOf(recordElement).getQualifiedName().toString();
+    }
+
+    private String getRecordName(TypeElement recordElement) {
+        String recordName = "";
+        Element element = recordElement;
+        while (!(element instanceof PackageElement)) {
+            recordName = ((TypeElement) element).getSimpleName().toString() +
+                    (recordName.isEmpty() ? "" : ".") + recordName;
+            element = element.getEnclosingElement();
+        }
+        return recordName;
+    }
+
+    private String getBuilderName(TypeElement recordElement) {
+        return recordElement.getSimpleName().toString() + "Builder";
+    }
+
+    private List<RecordComponent> getRecordComponents(TypeElement recordElement) {
+        return recordElement.getRecordComponents()
+                .stream()
+                .map(rc -> new RecordComponent(
+                        rc.getSimpleName().toString(),
+                        rc.asType().toString()))
+                .collect(Collectors.toList());
     }
 
 }
