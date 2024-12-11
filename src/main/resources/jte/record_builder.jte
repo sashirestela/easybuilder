@@ -8,6 +8,7 @@
 @param List<RecordComponent> recordComponents
 package ${packageName};
 
+@javax.annotation.processing.Generated("io.github.sashirestela.easybuilder.processor.BuilderProcessor")
 public class ${builderName} {
 
     // Fields
