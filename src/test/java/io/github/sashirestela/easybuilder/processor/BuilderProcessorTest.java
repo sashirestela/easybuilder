@@ -112,6 +112,20 @@ class BuilderProcessorTest {
     }
 
     @Test
+    void shouldCompileFromNoPackageRecord() {
+        String generatedFile = "NoPackageRecordBuilder";
+        compileTestBuilder
+                .andSourceFiles("testcases/NoPackageRecord.java.ct")
+                .whenCompiled()
+                .thenExpectThat()
+                .compilationSucceeds()
+                .andThat()
+                .generatedSourceFile(generatedFile)
+                .exists()
+                .executeTest();
+    }
+
+    @Test
     void shouldCompileFromEmptyRecord() {
         String generatedFile = "com.mycompany.demo.model.EmptyRecordBuilder";
         compileTestBuilder

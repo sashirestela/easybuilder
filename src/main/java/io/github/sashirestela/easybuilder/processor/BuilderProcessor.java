@@ -76,7 +76,9 @@ public class BuilderProcessor extends AbstractProcessor {
         TemplateOutput templateOutput = new StringOutput();
         Configurator.one().getTemplateEngine().render("record_builder.jte", context, templateOutput);
 
-        JavaFileObject javaFile = filer.createSourceFile(packageName + "." + builderName);
+        JavaFileObject javaFile = filer.createSourceFile(packageName.isEmpty()
+                ? builderName
+                : packageName + "." + builderName);
         try (Writer writer = javaFile.openWriter()) {
             writer.write(templateOutput.toString());
         }

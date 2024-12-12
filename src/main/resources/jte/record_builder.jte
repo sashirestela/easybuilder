@@ -6,7 +6,8 @@
 @param String recordName
 @param String builderName
 @param List<RecordComponent> recordComponents
-package ${packageName};
+@if(!packageName.isEmpty())package ${packageName};
+@endif
 
 @javax.annotation.processing.Generated("io.github.sashirestela.easybuilder.processor.BuilderProcessor")
 public class ${builderName} {
