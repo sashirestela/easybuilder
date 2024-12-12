@@ -1,0 +1,13 @@
+package com.mycompany.demo.model;
+
+import io.github.sashirestela.easybuilder.annotation.Builder;
+
+public record CompositeRecord(Integer id, IntermediateRecord intermediateRecord) {
+
+    public record IntermediateRecord(Integer id, NestedRecord nestedRecord) {
+
+        @Builder
+        public record NestedRecord(Integer id, String detail) {}
+
+    }
+}
