@@ -1,0 +1,6 @@
+package com.mycompany.demo.model;
+
+import io.github.sashirestela.easybuilder.annotation.Builder;
+
+@Builder
+public record StandardRecord(Integer id, String name, Double amount) {}
