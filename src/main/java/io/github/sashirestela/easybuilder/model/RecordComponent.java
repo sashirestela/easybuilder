@@ -18,4 +18,8 @@ public class RecordComponent {
         return type;
     }
 
+    public String getNameForWith() {
+        return "with" + name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
+
 }
