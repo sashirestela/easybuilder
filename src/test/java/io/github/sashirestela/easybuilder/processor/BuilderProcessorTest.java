@@ -112,30 +112,44 @@ class BuilderProcessorTest {
     }
 
     @Test
-    void shouldCompileFromNoPackageRecord() {
-        String generatedFile = "NoPackageRecordBuilder";
+    void shouldNotCompileFromBuilderForNoRecord() {
         compileTestBuilder
-                .andSourceFiles("testcases/NoPackageRecord.java.ct")
+                .andSourceFiles("testcases/BuilderForNoRecord.java.ct")
                 .whenCompiled()
                 .thenExpectThat()
                 .compilationSucceeds()
                 .andThat()
-                .generatedSourceFile(generatedFile)
-                .exists()
+                .compilerMessage()
+                .ofKindWarning()
+                .contains("The annotated element isn't a Record.")
                 .executeTest();
     }
 
     @Test
-    void shouldCompileFromEmptyRecord() {
-        String generatedFile = "com.mycompany.demo.model.EmptyRecordBuilder";
+    void shouldNotCompileFromOwnerPrivateRecord() {
+        compileTestBuilder
+                .andSourceFiles("testcases/OwnerPrivateRecord.java.ct")
+                .whenCompiled()
+                .thenExpectThat()
+                .compilationSucceeds()
+                .andThat()
+                .compilerMessage()
+                .ofKindWarning()
+                .contains("The annotated Record is private.")
+                .executeTest();
+    }
+
+    @Test
+    void shouldNotCompileFromEmptyRecord() {
         compileTestBuilder
                 .andSourceFiles("testcases/EmptyRecord.java.ct")
                 .whenCompiled()
                 .thenExpectThat()
                 .compilationSucceeds()
                 .andThat()
-                .generatedSourceFile(generatedFile)
-                .exists()
+                .compilerMessage()
+                .ofKindWarning()
+                .contains("The annotated Record hasn't components.")
                 .executeTest();
     }
 

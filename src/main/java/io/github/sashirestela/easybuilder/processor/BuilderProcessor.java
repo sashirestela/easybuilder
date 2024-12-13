@@ -15,6 +15,8 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
@@ -51,6 +53,16 @@ public class BuilderProcessor extends AbstractProcessor {
             messager.printMessage(Kind.NOTE, "Processing Annotations " + annotations.toString());
         }
         for (Element element : roundEnv.getElementsAnnotatedWith(Builder.class)) {
+            if (element.getKind() != ElementKind.RECORD) {
+                messager.printMessage(Kind.WARNING, "The annotated element isn't a Record.", element);
+                continue;
+            } else if (element.getModifiers().stream().anyMatch(modifier -> modifier == Modifier.PRIVATE)) {
+                messager.printMessage(Kind.WARNING, "The annotated Record is private.", element);
+                continue;
+            } else if (((TypeElement) element).getRecordComponents().isEmpty()) {
+                messager.printMessage(Kind.WARNING, "The annotated Record hasn't components.", element);
+                continue;
+            }
             try {
                 messager.printMessage(Kind.NOTE, "Generating from Class " + element);
                 generateSourceFile((TypeElement) element);
@@ -58,7 +70,7 @@ public class BuilderProcessor extends AbstractProcessor {
                 messager.printMessage(Kind.ERROR, "Error with " + element + ": " + e.getMessage());
             }
         }
-        return false;
+        return true;
     }
 
     private void generateSourceFile(TypeElement recordElement) throws Exception {

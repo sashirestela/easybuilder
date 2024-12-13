@@ -1,0 +1,10 @@
+package com.mycompany.demo.model;
+
+import io.github.sashirestela.easybuilder.annotation.Builder;
+
+public record OwnerPrivateRecord(PrivateRecord privateRecord) {
+
+    @Builder
+    private record PrivateRecord(Integer id, String name) {}
+
+}
