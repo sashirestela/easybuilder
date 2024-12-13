@@ -1,0 +1,10 @@
+package com.mycompany.demo.model;
+
+import io.github.sashirestela.easybuilder.annotation.Builder;
+
+@Builder
+public class BuilderForNoRecord {
+    private Integer id;
+    private String name;
+    private Double amount;
+}
