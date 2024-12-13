@@ -64,7 +64,7 @@ class BuilderProcessorTest {
                 .exists()
                 .andThat()
                 .generatedClassesTestedSuccessfullyBy(cuteClassLoader -> {
-                    String[] methods = { "id", "name", "amount" };
+                    String method = "name";
                     Class<?>[] classes = { Integer.class, String.class, Double.class };
                     Object[] values1 = { 101, "Expected", 17.65 };
                     Object[] values2 = { 101, "Temporal", 17.65 };
@@ -74,7 +74,39 @@ class BuilderProcessorTest {
                     Object temporalRecord = newObjectFromClass(recordClass, classes, values2);
 
                     Class<?> builderClass = cuteClassLoader.getClass(generatedFile);
-                    Object actualRecord = newStaleObjectFromBuilder(builderClass, methods[1], classes[1], values1[1],
+                    Object actualRecord = newStaleObjectFromBuilder(builderClass, method, classes[1], values1[1],
+                            recordClass, temporalRecord);
+
+                    assertEquals(expectedRecord, actualRecord);
+                })
+                .executeTest();
+    }
+
+    @Test
+    void shouldCompileFromStandardRecordAndTestWitherFromBuilder() {
+        String originalFile = "com.mycompany.demo.model.StandardRecord";
+        String generatedFile = "com.mycompany.demo.model.StandardRecordBuilder";
+        compileTestBuilder
+                .andSourceFiles("testcases/StandardRecord.java.ct")
+                .whenCompiled()
+                .thenExpectThat()
+                .compilationSucceeds()
+                .andThat()
+                .generatedSourceFile(generatedFile)
+                .exists()
+                .andThat()
+                .generatedClassesTestedSuccessfullyBy(cuteClassLoader -> {
+                    String method = "withName";
+                    Class<?>[] classes = { Integer.class, String.class, Double.class };
+                    Object[] values1 = { 101, "Expected", 17.65 };
+                    Object[] values2 = { 101, "Temporal", 17.65 };
+
+                    Class<?> recordClass = cuteClassLoader.getClass(originalFile);
+                    Object expectedRecord = newObjectFromClass(recordClass, classes, values1);
+                    Object temporalRecord = newObjectFromClass(recordClass, classes, values2);
+
+                    Class<?> builderClass = cuteClassLoader.getClass(generatedFile);
+                    Object actualRecord = newObjectByWithFromBuilder(builderClass, method, classes[1], values1[1],
                             recordClass, temporalRecord);
 
                     assertEquals(expectedRecord, actualRecord);
@@ -182,6 +214,12 @@ class BuilderProcessorTest {
             builderObject = Util.invoke(Util.method(builderClass, methods[i], classes[i]), builderObject, values[i]);
         }
         return Util.invoke(Util.method(builderClass, "build"), builderObject, EMPTY);
+    }
+
+    private Object newObjectByWithFromBuilder(Class<?> builderClass, String method, Class<?> clazz, Object value,
+            Class<?> baseClass, Object baseObject) throws Exception {
+        Object builderObject = Util.invoke(Util.method(builderClass, "builder", baseClass), null, baseObject);
+        return Util.invoke(Util.method(builderClass, method, clazz), builderObject, value);
     }
 
 }
