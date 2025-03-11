@@ -6,7 +6,7 @@
 
   <groupId>io.github.sashirestela</groupId>
   <artifactId>easybuilder</artifactId>
-  <version>0.3.0</version>
+  <version>0.3.1</version>
   <packaging>jar</packaging>
 
   <name>easybuilder</name>
@@ -49,24 +49,25 @@
   <properties>
     <!-- General -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.version>3.6.3</maven.version>
     <maven.compiler.release>17</maven.compiler.release>
     <!-- Dependencies Versions -->
-    <slf4j.version>2.0.16</slf4j.version>
-    <jte.version>3.1.15</jte.version>
-    <junit.version>5.11.3</junit.version>
+    <slf4j.version>2.0.17</slf4j.version>
+    <jte.version>3.1.16</jte.version>
+    <junit.version>5.12.0</junit.version>
     <cute.version>1.7.0</cute.version>
     <!-- Plugins Versions -->
-    <compiler.version>3.13.0</compiler.version>
+    <compiler.version>3.14.0</compiler.version>
     <enforcer.version>3.5.0</enforcer.version>
     <surefire.version>3.5.2</surefire.version>
     <exec.version>3.5.0</exec.version>
     <jacoco.version>0.8.12</jacoco.version>
     <versions.version>2.18.0</versions.version>
     <source.version>3.3.1</source.version>
-    <javadoc.version>3.11.1</javadoc.version>
+    <javadoc.version>3.11.2</javadoc.version>
     <gpg.version>3.2.7</gpg.version>
     <sonatype.version>1.7.0</sonatype.version>
-    <spotless.version>2.43.0</spotless.version>
+    <spotless.version>2.44.3</spotless.version>
   </properties>
 
   <profiles>
@@ -75,6 +76,13 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+          <version>${slf4j.version}</version>
+        </dependency>
+      </dependencies>
     </profile>
     <profile>
       <id>release</id>
@@ -146,59 +154,28 @@
     </profile>
   </profiles>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
-        <version>${slf4j.version}</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>gg.jte</groupId>
-        <artifactId>jte</artifactId>
-        <version>${jte.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter</artifactId>
-        <version>${junit.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>io.toolisticon.cute</groupId>
-        <artifactId>cute</artifactId>
-        <version>${cute.version}</version>
-        <scope>test</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4j.version}</version>
     </dependency>
     <dependency>
       <groupId>gg.jte</groupId>
       <artifactId>jte</artifactId>
+      <version>${jte.version}</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.toolisticon.cute</groupId>
       <artifactId>cute</artifactId>
+      <version>${cute.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -251,7 +228,7 @@
             <configuration>
               <rules>
                 <requireMavenVersion>
-                  <version>3.6.3</version>
+                  <version>${maven.version}</version>
                 </requireMavenVersion>
               </rules>
             </configuration>
